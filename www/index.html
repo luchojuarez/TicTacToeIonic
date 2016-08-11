@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>TicTacToe</title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <script src="js/app.js"></script>
+    <script src="cordova.js"></script>
+  </head>
+  <body ng-app="starter" ng-controller='mainControl'>
+
+    <ion-pane>
+        <ion-header-bar class="bar-stable">
+            <h1 class="title">TicTacToe{{titulo}}</h1>
+            <button class="button button-icon" ng-click="newPlayer()" ng-disabled="desactivarAdd()">
+                <i class="ion-android-person-add"> add player</i>
+            </button>
+        </ion-header-bar>
+        <ion-content>
+            <ion-list>
+                <ion-item ng-repeat="p in players">
+                    <a class="item item-icon-left" href="#">
+                        <i class="icon ion-person-stalker"></i>
+                            player: {{p.name}} ({{p.piece}})
+                        <span class="badge badge-assertive">puntos: {{p.points}}</span>
+                    </a>
+                </ion-item>
+            </ion-list>
+            <div class="button-bar">
+                <a class="button button-balanced button-outline" ng-click='putPiece(0)'>{{board[0]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(1)'>{{board[1]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(2)'>{{board[2]}}</a>
+            </div>
+            <div class="button-bar">
+                <a class="button button-balanced button-outline" ng-click='putPiece(3)'>{{board[3]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(4)'>{{board[4]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(5)'>{{board[5]}}</a>
+            </div>
+            <div class="button-bar">
+                <a class="button button-balanced button-outline" ng-click='putPiece(6)'>{{board[6]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(7)'>{{board[7]}}</a>
+                <a class="button button-balanced button-outline" ng-click='putPiece(8)'>{{board[8]}}</a>
+            </div>
+        <a class="button button-balanced">{{mensajeUsuario}} {{current.name}}</a>
+        </ion-content>
+        <div class="bar bar-footer bar-balanced">
+            <div class="title">{{VS}}</div>
+            <a class="button ion-social-github" href="https://www.google.com.ar"> fork me</a>
+        </div>
+    </ion-pane>
+
+
+
+    <script id="new-player.html" type="text/ng-template">
+
+        <div class="modal">
+        <ion-header-bar class="bar-secondary">
+            <h1 class="title">New player</h1>
+            <button class="button button-clear button-positive" ng-click="closeNewPlayer()">Cancel</button>
+        </ion-header-bar>
+
+        <!-- Modal content area -->
+        <ion-content>
+
+            <form ng-submit="setPlayer(playerName)">
+                <div class="list">
+                <label class="item item-input">
+                    <input type="text" placeholder="player name" ng-model="playerName">
+                </label>
+                </div>
+                <div class="padding">
+                    <button type="submit" class="button button-block button-positive">submit</button>
+                </div>
+            </form>
+
+        </ion-content>
+
+        </div>
+
+    </script>
+  </body>
+</html>
