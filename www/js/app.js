@@ -1,36 +1,3 @@
-function gameIsDone(board) {
-	var horizontal1 = Boolean(Boolean(board[0]==board[1]) && Boolean(board[1]==board[2]) && Boolean(board[0]!=undefined));
-	var horizontal2 = Boolean(Boolean(board[3]==board[4]) && Boolean(board[4]==board[5]) && Boolean(board[3]!=undefined));
-	var horizontal3 = Boolean(Boolean(board[6]==board[7]) && Boolean(board[7]==board[8]) && Boolean(board[6]!=undefined));
-	var vertical1   = Boolean(Boolean(board[6]==board[3]) && Boolean(board[3]==board[0]) && Boolean(board[6]!=undefined));
-	var vertical2   = Boolean(Boolean(board[7]==board[4]) && Boolean(board[4]==board[1]) && Boolean(board[7]!=undefined));
-	var vertical3   = Boolean(Boolean(board[8]==board[5]) && Boolean(board[5]==board[2]) && Boolean(board[8]!=undefined));
-	var diagonal1   = Boolean(Boolean(board[6]==board[4]) && Boolean(board[4]==board[2]) && Boolean(board[6]!=undefined));
-	var diagonal2   = Boolean(Boolean(board[0]==board[4]) && Boolean(board[4]==board[8]) && Boolean(board[0]!=undefined));
-	var state = Boolean(Boolean(horizontal1)||Boolean(horizontal2)||Boolean(horizontal3)||Boolean(vertical1)||Boolean(vertical2)||Boolean(vertical3)||Boolean(diagonal2)||Boolean(diagonal1));
-	return state;
-}
-
-function gameIsTied(scope) {
-	return false;
-}
-
-function winner(scope) {
-    scope.current.points++;
-    scope.board=[];
-	scope.showWin();
-}
-function changeTurn(scope){
-	if(scope.current==scope.players[0]){
-		scope.players[0].turn=undefined;
-		scope.players[1].turn='(turn)';
-		scope.current=scope.players[1]
-	}else{
-		scope.players[1].turn=undefined;
-		scope.players[0].turn='(turn)';
-		scope.current=scope.players[0]
-	}
-}
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
@@ -55,24 +22,75 @@ angular.module('starter', ['ionic'])
     }
   });
 })
-/*
 .factory('Players',function () {
-    var a ={
-        getAll:function () {
-            var x=window.localStorage['players'];
-            (x)?return angular.toJson(x):return[];
-        }
+    return{
+        getAll:function (){
+            var playerString = window.localStorage['players'];
+                if(playerString) {
+                    return angular.fromJson(playerString);
+            }
+            return [];
+        },
         save:function (playersList) {
             window.localStorage['players']=angular.toJson(playersList);
-        }
+        },
         newPlayer:function (name) {
-            return{name:name,points:0}
+            return{
+                name:name,
+                points:0,
+                turn:undefined,
+                piece:undefined
+            }
         }
     }
-    return a;
 })
-*/
-.controller('mainControl',function($scope,$ionicModal) {
+.factory('Game',function (){
+	return {
+	gameIsDone:function (scope) {
+		var horizontal1 = ((scope.board[0]==scope.board[1]) && (scope.board[1]==scope.board[2]) && (scope.board[0]!=undefined));
+		var horizontal2 = ((scope.board[3]==scope.board[4]) && (scope.board[4]==scope.board[5]) && (scope.board[3]!=undefined));
+		var horizontal3 = ((scope.board[6]==scope.board[7]) && (scope.board[7]==scope.board[8]) && (scope.board[6]!=undefined));
+		var vertical1   = ((scope.board[6]==scope.board[3]) && (scope.board[3]==scope.board[0]) && (scope.board[6]!=undefined));
+		var vertical2   = ((scope.board[7]==scope.board[4]) && (scope.board[4]==scope.board[1]) && (scope.board[7]!=undefined));
+		var vertical3   = ((scope.board[8]==scope.board[5]) && (scope.board[5]==scope.board[2]) && (scope.board[8]!=undefined));
+		var diagonal1   = ((scope.board[6]==scope.board[4]) && (scope.board[4]==scope.board[2]) && (scope.board[6]!=undefined));
+		var diagonal2   = ((scope.board[0]==scope.board[4]) && (scope.board[4]==scope.board[8]) && (scope.board[0]!=undefined));
+		var state = ((horizontal1)||(horizontal2)||(horizontal3)||(vertical1)||(vertical2)||(vertical3)||(diagonal2)||(diagonal1));
+		return state;
+	},
+	gameIsTied:function(scope) {
+		// Soon
+		return false;
+	},
+	winner:function(scope) {
+	    scope.current.points++;
+	    scope.board=[];
+		scope.showWin();
+	},
+	changeTurn:function(scope){
+		if(scope.current==scope.currentsPlayers[0]){
+			scope.currentsPlayers[0].turn=undefined;
+			scope.currentsPlayers[1].turn='(turn)';
+			scope.current=scope.currentsPlayers[1]
+		}else{
+			scope.currentsPlayers[1].turn=undefined;
+			scope.currentsPlayers[0].turn='(turn)';
+			scope.current=scope.currentsPlayers[0]
+		}
+	},
+    prepareGame:function (scope) {
+        if((scope.currentsPlayers.length===2)){
+            scope.current=scope.currentsPlayers[0];
+            scope.currentsPlayers[0].turn='(turn)';
+            scope.currentsPlayers[1].turn=undefined;
+            scope.currentsPlayers[0].piece='X';
+            scope.currentsPlayers[1].piece='O';
+            scope.VS=scope.currentsPlayers[0].name+' VS '+scope.currentsPlayers[1].name;
+        }
+    }
+}
+})
+.controller('mainControl',function($scope,$ionicModal,Players,Game) {
 
     $ionicModal.fromTemplateUrl('new-player.html', function(modal) {
         $scope.taskModal = modal;
@@ -95,25 +113,33 @@ angular.module('starter', ['ionic'])
     animation: 'slide-in-up',
     });
 
-    $scope.players=[];
+	$ionicModal.fromTemplateUrl('choisePlayer.html', function(modal) {
+		$scope.choisePlayerModal = modal;
+	}, {
+	scope: $scope,
+	animation: 'slide-in-up',
+	});
+
+    $scope.savedPlayers=Players.getAll();
+	$scope.currentsPlayers=[];
     $scope.current=[];
     $scope.board=[];
 
     $scope.putPiece=function(position) {
-        if($scope.players.length===2){
+        if($scope.currentsPlayers.length===2){
             if($scope.board[position]==='X'||$scope.board[position]==='O'){
                 console.error('ocupado');
 				$scope.showError('ocupado');
             }else{
                 $scope.board[position]=$scope.current.piece;
-                if (gameIsDone($scope.board)) {
-                    winner($scope);
+                if (Game.gameIsDone($scope)) {
+                    Game.winner($scope);
                 }
-				if (gameIsTied($scope)){
+				if (Game.gameIsTied($scope)){
 					$scope.board=[];
 				}
                 else{
-					changeTurn($scope);
+					Game.changeTurn($scope);
                 }
             }
         }
@@ -124,26 +150,26 @@ angular.module('starter', ['ionic'])
     }
 
     $scope.addPoints=function () {
-        $scope.players[0].points++;
+        $scope.currentsPlayers[0].points++;
     }
 
     $scope.desactivarAdd=function() {
-        return ($scope.players.length===2);
+        return ($scope.currentsPlayers.length===2);
     }
     $scope.desactivarTablero=function() {
-        return ($scope.players.length===0||$scope.players.length===1);
+        return ($scope.currentsPlayers.length===0||$scope.currentsPlayers.length===1);
     }
 
     $scope.setPlayer = function (playerName) {
-        if(($scope.players.length===1)||($scope.players.length===0)){
-            $scope.players.push({name:playerName,points:0});
-            $scope.taskModal.hide();
-            if(($scope.players.length===2)){
-                $scope.current=$scope.players[0];
-				$scope.players[0].turn='(turn)'
-                $scope.players[0].piece='X';
-                $scope.players[1].piece='O';
-                $scope.VS=$scope.players[0].name+' VS '+$scope.players[1].name;
+        $scope.taskModal.hide();
+        if(($scope.currentsPlayers.length===1)||($scope.currentsPlayers.length===0)){
+            var p=Players.newPlayer(playerName);
+            $scope.currentsPlayers.push(p);
+            console.log($scope.savedPlayers.length);
+            $scope.savedPlayers.push(p);
+            Players.save($scope.savedPlayers);
+            if(($scope.currentsPlayers.length===2)){
+                Game.prepareGame($scope);
             }
         }else{
             console.error("many players");
@@ -174,5 +200,22 @@ angular.module('starter', ['ionic'])
 		$scope.winModal.show();
 	}
 
+	$scope.closeChoisePlayer=function() {
+		$scope.choisePlayerModal.hide();
+	}
+	$scope.showChoisePlayer=function() {
+		$scope.choisePlayerModal.show();
+	}
+	$scope.choisePlayer=function(player) {
+		$scope.currentsPlayers.push(player);
+        if(($scope.currentsPlayers.length===2)){
+            Game.prepareGame($scope);
+        }
+		$scope.choisePlayerModal.hide();
+	}
+    $scope.deletePlayer=function(player){
+        //window.localStorage.clear();
+		$scope.choisePlayerModal.hide();
+    }
 
 })

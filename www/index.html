@@ -24,7 +24,7 @@
         </ion-header-bar>
         <ion-content>
             <ion-list>
-                <ion-item ng-repeat="p in players">
+                <ion-item ng-repeat="p in currentsPlayers">
                     <a class="item item-icon-left">
                         <i class="icon ion-person-stalker"></i>
                             {{p.name}} ({{p.piece}})
@@ -67,17 +67,17 @@
 
         <!-- Modal content area -->
         <ion-content>
-
             <form ng-submit="setPlayer(playerName)">
                 <div class="list">
                 <label class="item item-input">
-                    <input type="text" placeholder="player name" ng-model="playerName" required>
+                    <input type="text" placeholder="player name" ng-model="playerName" required autofocus="autofocus" >
                 </label>
                 </div>
                 <div class="padding">
                     <button type="submit" class="button button-block button-balanced">submit</button>
                 </div>
             </form>
+            <button class="button button-block button-balanced" ng-click="closeNewPlayer();showChoisePlayer()">Or load saved player</button>
 
         </ion-content>
 
@@ -104,7 +104,7 @@
             </ion-header-bar>
 
             <ion-content>
-                <ion-item ng-repeat="p in players">
+                <ion-item ng-repeat="p in currentsPlayers">
                     <a class="item item-icon-left">
                         <i class="icon ion-person-stalker"></i>
                             {{p.name}} ({{p.piece}})
@@ -114,6 +114,32 @@
                 <button type="submit" class="button button-block button-balanced" ng-click='closeWin()'>Acept</button>
             </ion-content>
         </div>
+    </script>
+    <script id="choisePlayer.html" type="text/ng-template">
+
+        <div class="modal">
+        <ion-header-bar class="bar-secondary">
+            <h1 class="title">Choise player</h1>
+            <button class="button button-clear button-balanced" ng-click="closeChoisePlayer()">Cancel</button>
+        </ion-header-bar>
+
+        <!-- Modal content area -->
+        <ion-content>
+        <ion-item ng-repeat="p in savedPlayers">
+            <a class="item item-icon-left item-icon-right" ng-click='choisePlayer(p);'>
+                <div>
+                    <i class="icon ion-person-stalker"></i>
+                    <h2>{{p.name}}</h2>
+                    <p>total points {{p.points}}</p>
+                </div>
+                <i class='ion-trash-b' ng-click='deletePlayer(p)'></i>
+            </a>
+        </ion-item>
+
+        </ion-content>
+
+        </div>
+
     </script>
   </body>
 </html>
