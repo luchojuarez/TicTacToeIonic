@@ -1,3 +1,19 @@
+function gameIsDone(board) {
+	var horizontal1 = Boolean(Boolean(board[0]==board[1]) && Boolean(board[1]==board[2]) && Boolean(board[0]!=undefined));
+	var horizontal2 = Boolean(Boolean(board[3]==board[4]) && Boolean(board[4]==board[5]) && Boolean(board[3]!=undefined));
+	var horizontal3 = Boolean(Boolean(board[6]==board[7]) && Boolean(board[7]==board[8]) && Boolean(board[6]!=undefined));
+	var vertical1   = Boolean(Boolean(board[6]==board[3]) && Boolean(board[3]==board[0]) && Boolean(board[6]!=undefined));
+	var vertical2   = Boolean(Boolean(board[7]==board[4]) && Boolean(board[4]==board[1]) && Boolean(board[7]!=undefined));
+	var vertical3   = Boolean(Boolean(board[8]==board[5]) && Boolean(board[5]==board[2]) && Boolean(board[8]!=undefined));
+	var diagonal1   = Boolean(Boolean(board[6]==board[4]) && Boolean(board[4]==board[2]) && Boolean(board[6]!=undefined));
+	var diagonal2   = Boolean(Boolean(board[0]==board[4]) && Boolean(board[4]==board[8]) && Boolean(board[0]!=undefined));
+	var state = Boolean(Boolean(horizontal1)||Boolean(horizontal2)||Boolean(horizontal3)||Boolean(vertical1)||Boolean(vertical2)||Boolean(vertical3)||Boolean(diagonal2)||Boolean(diagonal1));
+	return state;
+}
+function winner(scope) {
+    scope.current.points++;
+    scope.board=[];
+}
 // Ionic Starter App
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
@@ -21,4 +37,101 @@ angular.module('starter', ['ionic'])
       StatusBar.styleDefault();
     }
   });
+})
+/*
+.factory('Players',function () {
+    var a ={
+        getAll:function () {
+            var x=window.localStorage['players'];
+            (x)?return angular.toJson(x):return[];
+        }
+        save:function (playersList) {
+            window.localStorage['players']=angular.toJson(playersList);
+        }
+        newPlayer:function (name) {
+            return{name:name,points:0}
+        }
+    }
+    return a;
+})
+*/
+.controller('mainControl',function($scope,$ionicModal) {
+
+    $ionicModal.fromTemplateUrl('new-player.html', function(modal) {
+        $scope.taskModal = modal;
+    }, {
+    scope: $scope,
+    animation: 'slide-in-up'
+    });
+
+    $scope.mensajeUsuario="Load two players"
+    $scope.players=[];
+    $scope.current=[];
+    $scope.board=[];
+
+    $scope.putPiece=function(position) {
+        if($scope.players.length===2){
+            if($scope.board[position]==='X'||$scope.board[position]==='O'){
+                console.error('ocupado');
+            }else{
+                $scope.board[position]=$scope.current.piece;
+                if (gameIsDone($scope.board)) {
+                    winner($scope);
+                }
+				if ($scope.board.length===9){
+					$scope.board=[];
+				}
+                else{
+                    if($scope.current==$scope.players[0]){
+                        $scope.current=$scope.players[1]
+                    }else{
+                        $scope.current=$scope.players[0]
+                    }
+                }
+            }
+        }
+        else {
+            console.error('no players');
+        }
+    }
+
+    $scope.addPoints=function () {
+        $scope.players[0].points++;
+    }
+
+    $scope.desactivarAdd=function() {
+        return ($scope.players.length===2);
+    }
+    $scope.desactivarTablero=function() {
+        return ($scope.players.length===0||$scope.players.length===1);
+    }
+
+    $scope.setPlayer = function (playerName) {
+        if(($scope.players.length===1)||($scope.players.length===0)){
+            $scope.players.push({name:playerName,points:0});
+            $scope.taskModal.hide();
+            if(($scope.players.length===2)){
+                $scope.current=$scope.players[0];
+                $scope.players[0].piece='X';
+                $scope.players[1].piece='O';
+                $scope.VS=$scope.players[0].name+' VS '+$scope.players[1].name;
+                $scope.mensajeUsuario='It is the turn of: ';
+            }
+            playerName="";
+        }else{
+            console.error("many players");
+        }
+    }
+
+    $scope.newPlayer = function() {
+        $scope.taskModal.show();
+    };
+
+    $scope.closeNewPlayer = function() {
+        $scope.taskModal.hide();
+    }
+
+    if($scope.players.length){
+        $scope.titulo="number of players";
+    }
 })

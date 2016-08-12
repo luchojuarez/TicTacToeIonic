@@ -10,9 +10,26 @@ function gameIsDone(board) {
 	var state = Boolean(Boolean(horizontal1)||Boolean(horizontal2)||Boolean(horizontal3)||Boolean(vertical1)||Boolean(vertical2)||Boolean(vertical3)||Boolean(diagonal2)||Boolean(diagonal1));
 	return state;
 }
+
+function gameIsTied(scope) {
+	return false;
+}
+
 function winner(scope) {
     scope.current.points++;
     scope.board=[];
+	scope.showWin();
+}
+function changeTurn(scope){
+	if(scope.current==scope.players[0]){
+		scope.players[0].turn=undefined;
+		scope.players[1].turn='(turn)';
+		scope.current=scope.players[1]
+	}else{
+		scope.players[1].turn=undefined;
+		scope.players[0].turn='(turn)';
+		scope.current=scope.players[0]
+	}
 }
 // Ionic Starter App
 
@@ -64,7 +81,20 @@ angular.module('starter', ['ionic'])
     animation: 'slide-in-up'
     });
 
-    $scope.mensajeUsuario="Load two players"
+	$ionicModal.fromTemplateUrl('error.html', function(modal) {
+        $scope.errorModal = modal;
+    }, {
+    scope: $scope,
+    animation: 'slide-in-up',
+    });
+
+	$ionicModal.fromTemplateUrl('win.html', function(modal) {
+        $scope.winModal = modal;
+    }, {
+    scope: $scope,
+    animation: 'slide-in-up',
+    });
+
     $scope.players=[];
     $scope.current=[];
     $scope.board=[];
@@ -73,21 +103,22 @@ angular.module('starter', ['ionic'])
         if($scope.players.length===2){
             if($scope.board[position]==='X'||$scope.board[position]==='O'){
                 console.error('ocupado');
+				$scope.showError('ocupado');
             }else{
                 $scope.board[position]=$scope.current.piece;
                 if (gameIsDone($scope.board)) {
                     winner($scope);
                 }
+				if (gameIsTied($scope)){
+					$scope.board=[];
+				}
                 else{
-                    if($scope.current==$scope.players[0]){
-                        $scope.current=$scope.players[1]
-                    }else{
-                        $scope.current=$scope.players[0]
-                    }
+					changeTurn($scope);
                 }
             }
         }
         else {
+			$scope.showError('no players')
             console.error('no players');
         }
     }
@@ -109,12 +140,11 @@ angular.module('starter', ['ionic'])
             $scope.taskModal.hide();
             if(($scope.players.length===2)){
                 $scope.current=$scope.players[0];
+				$scope.players[0].turn='(turn)'
                 $scope.players[0].piece='X';
                 $scope.players[1].piece='O';
                 $scope.VS=$scope.players[0].name+' VS '+$scope.players[1].name;
-                $scope.mensajeUsuario='It is the turn of: ';
             }
-            playerName="";
         }else{
             console.error("many players");
         }
@@ -128,7 +158,21 @@ angular.module('starter', ['ionic'])
         $scope.taskModal.hide();
     }
 
-    if($scope.players.length){
-        $scope.titulo="number of players";
-    }
+	$scope.showError=function(msj,help) {
+		$scope.err=msj;
+		$scope.errHelp=help;
+		$scope.errorModal.show();
+	}
+	$scope.closeError=function() {
+		$scope.errorModal.hide();
+	}
+
+	$scope.closeWin=function() {
+		$scope.winModal.hide();
+	}
+	$scope.showWin=function() {
+		$scope.winModal.show();
+	}
+
+
 })

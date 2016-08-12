@@ -25,10 +25,10 @@
         <ion-content>
             <ion-list>
                 <ion-item ng-repeat="p in players">
-                    <a class="item item-icon-left" href="#">
+                    <a class="item item-icon-left">
                         <i class="icon ion-person-stalker"></i>
-                            player: {{p.name}} ({{p.piece}})
-                        <span class="badge badge-assertive">puntos: {{p.points}}</span>
+                            {{p.name}} ({{p.piece}})
+                        <span class="badge badge-assertive">{{p.turn}} {{p.points}}</span>
                     </a>
                 </ion-item>
             </ion-list>
@@ -47,7 +47,7 @@
                 <a class="button button-balanced button-outline" ng-click='putPiece(7)'>{{board[7]}}</a>
                 <a class="button button-balanced button-outline" ng-click='putPiece(8)'>{{board[8]}}</a>
             </div>
-        <a class="button button-balanced">{{mensajeUsuario}} {{current.name}}</a>
+
         </ion-content>
         <div class="bar bar-footer bar-balanced">
             <div class="title">{{VS}}</div>
@@ -62,7 +62,7 @@
         <div class="modal">
         <ion-header-bar class="bar-secondary">
             <h1 class="title">New player</h1>
-            <button class="button button-clear button-positive" ng-click="closeNewPlayer()">Cancel</button>
+            <button class="button button-clear button-balanced" ng-click="closeNewPlayer()">Cancel</button>
         </ion-header-bar>
 
         <!-- Modal content area -->
@@ -71,11 +71,11 @@
             <form ng-submit="setPlayer(playerName)">
                 <div class="list">
                 <label class="item item-input">
-                    <input type="text" placeholder="player name" ng-model="playerName">
+                    <input type="text" placeholder="player name" ng-model="playerName" required>
                 </label>
                 </div>
                 <div class="padding">
-                    <button type="submit" class="button button-block button-positive">submit</button>
+                    <button type="submit" class="button button-block button-balanced">submit</button>
                 </div>
             </form>
 
@@ -83,6 +83,37 @@
 
         </div>
 
+    </script>
+    <script id="error.html" type="text/ng-template">
+        <div class="modal">
+            <ion-header-bar class="bar-secondary">
+                <h1 class="title">Error: {{err}}</h1>
+            </ion-header-bar>
+
+            <ion-content>
+                <button type="submit" class="button button-block button-balanced ion-android-person-add" ng-click='closeError();newPlayer()'> Add a player</button>
+                <button type="submit" class="button button-block button-balanced" ng-click='closeError()'>Acept</button>
+            </ion-content>
+        </div>
+    </script>
+
+    <script id="win.html" type="text/ng-template">
+        <div class="modal">
+            <ion-header-bar class="bar-secondary">
+            <h1 class="title">{{current.name}} wins a round</h1>
+            </ion-header-bar>
+
+            <ion-content>
+                <ion-item ng-repeat="p in players">
+                    <a class="item item-icon-left">
+                        <i class="icon ion-person-stalker"></i>
+                            {{p.name}} ({{p.piece}})
+                        <span class="badge badge-assertive">{{p.points}}</span>
+                    </a>
+                </ion-item>
+                <button type="submit" class="button button-block button-balanced" ng-click='closeWin()'>Acept</button>
+            </ion-content>
+        </div>
     </script>
   </body>
 </html>
