@@ -26,21 +26,20 @@ angular.module('starter', ['ionic'])
     return{
         getAll:function (){
             var playerString = window.localStorage['players'];
-                if(playerString) {
-                    return angular.fromJson(playerString);
+            if(playerString) {
+                return angular.fromJson(playerString);
             }
             return [];
         },
-        save:function (playersList) {
-            window.localStorage['players']=angular.toJson(playersList);
-        },
         newPlayer:function (name) {
-            return{
+            var toSave = {
                 name:name,
                 points:0,
                 turn:undefined,
-                piece:undefined
+                piece:undefined,
+
             }
+            return toSave;
         }
     }
 })
@@ -120,6 +119,8 @@ angular.module('starter', ['ionic'])
 	animation: 'slide-in-up',
 	});
 
+    //$scope.persistence.store.websql.config(persistence, 'yourdbname', 'A database description', 5 * 1024 * 1024);
+
     $scope.savedPlayers=Players.getAll();
 	$scope.currentsPlayers=[];
     $scope.current=[];
@@ -167,7 +168,6 @@ angular.module('starter', ['ionic'])
             $scope.currentsPlayers.push(p);
             console.log($scope.savedPlayers.length);
             $scope.savedPlayers.push(p);
-            Players.save($scope.savedPlayers);
             if(($scope.currentsPlayers.length===2)){
                 Game.prepareGame($scope);
             }

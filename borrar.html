@@ -1,0 +1,6 @@
+<script src="http://cdn.jsdelivr.net/alasql/0.3/alasql.min.js"></script>
+<script>
+    var mybase = new alasql.Database('mybase');
+    mybase.exec('CREATE TABLE alumnos (id INT NOT NULL AUTOINCREMENT, name STRING)')
+    console.log(alasql.databases.mybase.tables);
+</script>
