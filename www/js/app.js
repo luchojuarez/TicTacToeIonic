@@ -30,7 +30,6 @@ angular.module('starter', ['ionic'])
             //alasql('DROP TABLE ticDB.players');
             alasql('CREATE TABLE IF NOT EXISTS ticDB.players (name STRING UNIQUE,points INT)');
             var res = alasql('SELECT * FROM ticDB.players');
-            //alasql('DELETE FROM ticDB.players where name="Lucho"');
             alasql('DETACH DATABASE ticDB');
 
             if(res.length===0)
@@ -66,8 +65,8 @@ angular.module('starter', ['ionic'])
             var toSave = alasql('SELECT * FROM ticDB.players where name=?;',[player.name])[0];
             toSave.points+=player.points;
             console.log(toSave.name, toSave.points);
-            //alasql('UPDATE ticDB.players SET points = ? WHERE name = ?;',[toSave.points,toSave.name]);
-            alasql('DELETE FROM ticDB.players where name="Lucho"',[player.name]);
+            alasql('UPDATE ticDB.players SET points = ? WHERE name = ?;',[toSave.points,toSave.name]);
+            //alasql('DELETE FROM ticDB.players where name="Lucho"',[player.name]);
             //alasql('INSERT INTO ticDB.players VALUES (?,?)',[toSave.name,toSave.points]);
             //alasql('SELECT * INTO ticDB.players FROM ?',[[{name:toSave[0].name,points:toSave[0].points}]]);
             alasql('DETACH DATABASE ticDB');
@@ -191,8 +190,7 @@ angular.module('starter', ['ionic'])
             }
         }
         else {
-			$scope.showError('no players')
-            console.error('no players');
+            $scope.newPlayer();
         }
     }
 
@@ -202,9 +200,6 @@ angular.module('starter', ['ionic'])
 
     $scope.desactivarAdd=function() {
         return ($scope.currentsPlayers.length===2);
-    }
-    $scope.desactivarTablero=function() {
-        return ($scope.currentsPlayers.length===0||$scope.currentsPlayers.length===1);
     }
 
     $scope.setPlayer = function (playerName) {

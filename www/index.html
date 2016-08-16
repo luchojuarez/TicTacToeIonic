@@ -22,7 +22,7 @@
         <ion-header-bar class="bar-stable">
             <button class="button button-icon icon ion-navicon"></button>
             <h1 class="title">TicTacToe{{titulo}}</h1>
-            <button class="button button-icon" ng-click="newPlayer()" ng-disabled="desactivarAdd()">
+            <button class="button button-icon" ng-click="choisePlayer()" ng-disabled="desactivarAdd()">
                 <i class="ion-android-person-add"></i>
             </button>
         </ion-header-bar>
@@ -56,7 +56,7 @@
         <div class="bar bar-footer bar-balanced">
             <div class="title">{{VS}}</div>
             <a class="button ion-social-github" href="https://github.com/luchojuarez/TicTacToeIonic"> fork me</a>
-            <a class="button ion-ios-game-controller-b" ng-click="finishRound()"> finish a round</a>
+            <a class="button ion-ios-game-controller-b" ng-click="finishRound()" ng-disabled="!desactivarAdd()"> finish a round</a>
         </div>
     </ion-pane>
 
