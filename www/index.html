@@ -12,17 +12,18 @@
 
     <!-- persistence -->
     <script src="http://cdn.jsdelivr.net/alasql/0.3/alasql.min.js"></script>
-
+    <script lang="javascript" src="dist/xlsx.core.min.js"></script>
     <script src="js/app.js"></script>
     <script src="cordova.js"></script>
   </head>
   <body ng-app="starter" ng-controller='mainControl'>
-
+<!-- -->
     <ion-pane>
         <ion-header-bar class="bar-stable">
+            <button class="button button-icon icon ion-navicon"></button>
             <h1 class="title">TicTacToe{{titulo}}</h1>
             <button class="button button-icon" ng-click="newPlayer()" ng-disabled="desactivarAdd()">
-                <i class="ion-android-person-add"> add player</i>
+                <i class="ion-android-person-add"></i>
             </button>
         </ion-header-bar>
         <ion-content>
@@ -55,10 +56,27 @@
         <div class="bar bar-footer bar-balanced">
             <div class="title">{{VS}}</div>
             <a class="button ion-social-github" href="https://github.com/luchojuarez/TicTacToeIonic"> fork me</a>
+            <a class="button ion-ios-game-controller-b" ng-click="finishRound()"> finish a round</a>
         </div>
     </ion-pane>
 
+    <script id="menu.html" type="text/ng-template">
+        <ion-side-menus>
+        <!-- Left menu -->
+            <ion-side-menu side="left">
+            <div><a class="button ion-social-github" href="https://github.com/luchojuarez/TicTacToeIonic"> fork me</a></div>
+            </ion-side-menu>
 
+            <ion-side-menu-content>
+            <!-- Main content, usually <ion-nav-view> -->
+            </ion-side-menu-content>
+
+            <!-- Right menu -->
+            <ion-side-menu side="right">
+            </ion-side-menu>
+
+        </ion-side-menus>
+    </script>
 
     <script id="new-player.html" type="text/ng-template">
 
@@ -80,7 +98,7 @@
                     <button type="submit" class="button button-block button-balanced">submit</button>
                 </div>
             </form>
-            <button class="button button-block button-balanced" ng-click="closeNewPlayer();showChoisePlayer()">Or load saved player</button>
+            <button class="button button-block button-balanced" ng-click="closeNewPlayer();showChoisePlayer()" autofocus="autofocus">Or load saved player</button>
 
         </ion-content>
 
@@ -94,7 +112,6 @@
             </ion-header-bar>
 
             <ion-content>
-                <button type="submit" class="button button-block button-balanced ion-android-person-add" ng-click='closeError();newPlayer()'> Add a player</button>
                 <button type="submit" class="button button-block button-balanced" ng-click='closeError()'>Acept</button>
             </ion-content>
         </div>
@@ -114,7 +131,7 @@
                         <span class="badge badge-assertive">{{p.points}}</span>
                     </a>
                 </ion-item>
-                <button type="submit" class="button button-block button-balanced" ng-click='closeWin()'>Acept</button>
+                <button type="submit" class="button button-block button-balanced" ng-click='closeWin()' autofocus="autofocus">Acept</button>
             </ion-content>
         </div>
     </script>
@@ -135,8 +152,8 @@
                     <h2>{{p.name}}</h2>
                     <p>total points {{p.points}}</p>
                 </div>
-                <i class='ion-trash-b' ng-click='deletePlayer(p)'></i>
             </a>
+            <button ng-click='deletePlayer(p)' class="button button-clear button-balanced">Delete</button>
         </ion-item>
 
         </ion-content>

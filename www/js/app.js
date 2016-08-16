@@ -25,21 +25,60 @@ angular.module('starter', ['ionic'])
 .factory('Players',function () {
     return{
         getAll:function (){
-            var playerString = window.localStorage['players'];
-            if(playerString) {
-                return angular.fromJson(playerString);
-            }
-            return [];
-        },
-        newPlayer:function (name) {
-            var toSave = {
-                name:name,
-                points:0,
-                turn:undefined,
-                piece:undefined,
+            alasql('CREATE localStorage DATABASE IF NOT EXISTS player');
+            alasql('ATTACH localStorage DATABASE player AS ticDB');
+            //alasql('DROP TABLE ticDB.players');
+            alasql('CREATE TABLE IF NOT EXISTS ticDB.players (name STRING UNIQUE,points INT)');
+            var res = alasql('SELECT * FROM ticDB.players');
+            //alasql('DELETE FROM ticDB.players where name="Lucho"');
+            alasql('DETACH DATABASE ticDB');
 
+            if(res.length===0)
+                return[]
+            else
+                return res;
+        },
+        newPlayer:function (name,scope) {
+            var a = alasql('SELECT * FROM ? where name=?',[scope.savedPlayers, name])
+            if (a.length===1){
+                console.error('user already exists');
+                scope.showError('user already exists');
             }
-            return toSave;
+            else{
+                var toSave = {
+                    name:name,
+                    points:0,
+                    turn:undefined,
+                    piece:undefined,
+                }
+                alasql('CREATE localStorage DATABASE IF NOT EXISTS player');
+                alasql('ATTACH localStorage DATABASE player AS ticDB');
+                alasql('CREATE TABLE IF NOT EXISTS ticDB.players (name STRING UNIQUE,points INT)');
+                alasql('SELECT * INTO ticDB.players FROM ?',[[{name:name, points:0}]]);
+                alasql('DETACH DATABASE ticDB');
+                return toSave;
+            }
+        },
+        save:function (player) {
+            alasql('CREATE localStorage DATABASE IF NOT EXISTS player;');
+            alasql('ATTACH localStorage DATABASE player AS ticDB;');
+            //alasql('CREATE TABLE IF NOT EXISTS ticDB.players (name STRING UNIQUE,points INT);');
+            var toSave = alasql('SELECT * FROM ticDB.players where name=?;',[player.name])[0];
+            toSave.points+=player.points;
+            console.log(toSave.name, toSave.points);
+            //alasql('UPDATE ticDB.players SET points = ? WHERE name = ?;',[toSave.points,toSave.name]);
+            alasql('DELETE FROM ticDB.players where name="Lucho"',[player.name]);
+            //alasql('INSERT INTO ticDB.players VALUES (?,?)',[toSave.name,toSave.points]);
+            //alasql('SELECT * INTO ticDB.players FROM ?',[[{name:toSave[0].name,points:toSave[0].points}]]);
+            alasql('DETACH DATABASE ticDB');
+        },
+        deletePlayer:function (player) {
+            console.log(player.name);
+            alasql('CREATE localStorage DATABASE IF NOT EXISTS player');
+            alasql('ATTACH localStorage DATABASE player AS ticDB');
+            alasql('CREATE TABLE IF NOT EXISTS ticDB.players (name STRING UNIQUE,points INT)');
+            alasql('DELETE from ticDB.players WHERE name=?',[player.name]);
+            alasql('DETACH DATABASE ticDB');
         }
     }
 })
@@ -119,7 +158,14 @@ angular.module('starter', ['ionic'])
 	animation: 'slide-in-up',
 	});
 
-    //$scope.persistence.store.websql.config(persistence, 'yourdbname', 'A database description', 5 * 1024 * 1024);
+	$ionicModal.fromTemplateUrl('menu.html', function(modal) {
+        $scope.mainMenuModal = modal;
+    }, {
+    scope: $scope,
+    animation: 'slide-in-up',
+    });
+
+
 
     $scope.savedPlayers=Players.getAll();
 	$scope.currentsPlayers=[];
@@ -164,12 +210,19 @@ angular.module('starter', ['ionic'])
     $scope.setPlayer = function (playerName) {
         $scope.taskModal.hide();
         if(($scope.currentsPlayers.length===1)||($scope.currentsPlayers.length===0)){
-            var p=Players.newPlayer(playerName);
-            $scope.currentsPlayers.push(p);
-            console.log($scope.savedPlayers.length);
-            $scope.savedPlayers.push(p);
-            if(($scope.currentsPlayers.length===2)){
-                Game.prepareGame($scope);
+            var saved = alasql('SELECT * FROM ? WHERE name=?',[$scope.savedPlayers,playerName])
+            if (saved.length===0) {
+                var p=Players.newPlayer(playerName,$scope);
+                if (p){
+                    $scope.currentsPlayers.push(p);
+                    $scope.savedPlayers.push(p);
+                    if(($scope.currentsPlayers.length===2)){
+                        Game.prepareGame($scope);
+                    }
+                }
+            }
+            else {
+                $scope.showError('Player already exists')
             }
         }else{
             console.error("many players");
@@ -214,8 +267,29 @@ angular.module('starter', ['ionic'])
 		$scope.choisePlayerModal.hide();
 	}
     $scope.deletePlayer=function(player){
-        //window.localStorage.clear();
-		$scope.choisePlayerModal.hide();
+        $scope.choisePlayerModal.hide();
+        Players.deletePlayer(player);
+        $scope.savedPlayers=Players.getAll();
     }
+    $scope.finishRound=function(){
+        if ($scope.currentsPlayers.length===2){
+            var winner=$scope.currentsPlayers[0];
+            var loser=$scope.currentsPlayers[1];
+            if (winner.points<loser.points) {
+                var aux = loser;
+                loser = winner;
+                winner = aux
+            }
+            winner.points-=loser.points;
+            Players.save(winner);
+        }
+        else {
+            $scope.showError('No players');
+            console.error('No players');
+        }
+    }
+    $scope.mainMenu=function() {
+		$scope.mainMenuModal.show();
+	}
 
 })
